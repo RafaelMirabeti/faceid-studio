@@ -1,39 +1,1137 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FaceID Studio</title>
-<script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-<style>
-:root{color-scheme:dark;--bg:#0b0d17;--panel:#151a2b;--line:#303750;--text:#f5f6ff;--muted:#aab2c9;--accent:#a78bfa;--cyan:#67e8f9;--red:#fb7185}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#202044,var(--bg) 60%);font:15px/1.5 system-ui,sans-serif;color:var(--text)}main{max-width:1120px;margin:auto;padding:26px 16px 44px}.head{display:flex;gap:14px;align-items:center;margin-bottom:22px}.logo{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--cyan));color:#101322;font-size:26px;font-weight:900}.eyebrow{color:var(--cyan);font-size:11px;letter-spacing:.15em;font-weight:800;text-transform:uppercase}h1{font-size:clamp(25px,4vw,35px);margin:2px 0;line-height:1.2}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(290px,.85fr);gap:16px}.panel{border:1px solid var(--line);border-radius:19px;background:rgba(21,26,43,.95);padding:19px;min-width:0}.panel h2{font-size:17px;margin:0 0 14px}.screen{aspect-ratio:4/3;position:relative;background:#070911;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:grid;place-items:center}.screen video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}.placeholder{text-align:center;color:var(--muted);padding:15px}.placeholder span{font-size:42px;display:block}.hidden{display:none!important}.status{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;margin:11px 0}.dot{width:8px;height:8px;border-radius:50%;background:#64748b}.dot.live{background:#4ade80}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{cursor:pointer;border:1px solid var(--line);background:#252b40;color:var(--text);border-radius:10px;padding:10px 13px;font:inherit;font-weight:700}.btn.primary{background:linear-gradient(120deg,var(--accent),var(--cyan));color:#111323;border:0}.btn:disabled{opacity:.45;cursor:not-allowed}.field{display:grid;gap:6px;margin-bottom:12px}.field label{color:var(--muted);font-size:12px;font-weight:700}.field input,.field select{width:100%;background:#0d1120;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:15px}.stat{border:1px solid var(--line);border-radius:12px;padding:11px;background:#0d1120}.stat strong{display:block;font-size:22px}.stat span{color:var(--muted);font-size:12px}.result{background:#0d1120;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:12px;min-height:50px;color:var(--muted);overflow-wrap:anywhere}.people{display:grid;gap:8px;margin-top:10px}.person{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px;background:#0d1120;border:1px solid var(--line);border-radius:11px}.person strong,.person small{display:block;overflow-wrap:anywhere}.person small{color:var(--muted)}.person button{background:transparent;color:var(--red);border:1px solid #713143;border-radius:8px;padding:6px;cursor:pointer}.note{margin-top:16px;padding:13px 15px;border:1px solid #594b86;background:#1a1830;color:#ded8ff;border-radius:12px;font-size:12px}.note p{margin:0}.empty{color:var(--muted);font-size:13px}.foot{text-align:center;color:#7d859d;font-size:12px;margin-top:18px}@media(max-width:780px){.grid{grid-template-columns:1fr}.panel{padding:14px}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FaceID Studio | Reconhecimento Facial</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --panel: #131721;
+      --panel2: #191e2a;
+      --border: #292f3d;
+      --text: #f2f5fc;
+      --muted: #8993a7;
+      --accent: #8b7cff;
+      --green: #42e6a4;
+      --red: #ff7185;
+      --yellow: #ffd479;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 15% 0%, #222047 0%, transparent 38%),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, Arial, sans-serif;
+    }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .topbar {
+      height: 76px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5%;
+      background: #0b0d12cc;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -.5px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #8b7cff, #5447d7);
+      font-size: 21px;
+    }
+
+    .badge {
+      border: 1px solid #315744;
+      background: #153326;
+      color: var(--green);
+      border-radius: 20px;
+      padding: 7px 12px;
+      font-size: 12px;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: auto;
+      padding: 35px 24px 70px;
+    }
+
+    .eyebrow {
+      color: #a89cff;
+      text-transform: uppercase;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    h1 {
+      font-size: clamp(28px, 4vw, 42px);
+      letter-spacing: -1.5px;
+      margin: 10px 0;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 680px;
+      margin-bottom: 28px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 26px 0;
+    }
+
+    .stat, .panel, .person-card {
+      border: 1px solid var(--border);
+      background: #131721eF;
+      border-radius: 17px;
+    }
+
+    .stat { padding: 19px; }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      margin-top: 7px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(300px, .8fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel { padding: 22px; min-width: 0; }
+
+    .panel-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 17px;
+    }
+
+    h2 { font-size: 18px; margin: 0; }
+    h3 { font-size: 15px; margin: 0; }
+
+    .muted { color: var(--muted); font-size: 13px; }
+
+    .camera {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      border-radius: 13px;
+      background: #090b10;
+      border: 1px solid #303749;
+    }
+
+    video, canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    video {
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+
+    canvas { pointer-events: none; }
+
+    .camera-label {
+      position: absolute;
+      z-index: 2;
+      top: 12px;
+      left: 12px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      background: #080a10c9;
+      color: #dce1ef;
+      font-size: 11px;
+      border: 1px solid #ffffff20;
+    }
+
+    .camera-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 0 0;
+      align-items: center;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #677087;
+      margin-right: 5px;
+    }
+
+    .dot.on { background: var(--green); }
+
+    .btn {
+      padding: 11px 14px;
+      border-radius: 9px;
+      border: 1px solid transparent;
+      font-weight: 700;
+      font-size: 12px;
+      transition: .15s;
+    }
+
+    .btn:hover { filter: brightness(1.12); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .success {
+      background: var(--green);
+      color: #071a12;
+    }
+
+    .secondary {
+      background: var(--panel2);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .danger {
+      color: var(--red);
+      background: #321a25;
+      border-color: #542b38;
+    }
+
+    .full { width: 100%; }
+
+    .capture-box {
+      margin-top: 17px;
+      padding: 16px;
+      background: #191b30;
+      border: 1px solid #49416e;
+      border-radius: 12px;
+    }
+
+    .capture-box p {
+      color: #c2bddf;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .field {
+      display: block;
+      width: 100%;
+      margin: 9px 0 13px;
+      border: 1px solid #343b4c;
+      background: #0e1118;
+      color: var(--text);
+      padding: 12px;
+      border-radius: 9px;
+      outline: none;
+    }
+
+    .field:focus { border-color: var(--accent); }
+
+    label {
+      color: #bbc3d4;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .capture-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .person-list {
+      display: grid;
+      gap: 13px;
+    }
+
+    .person-card { padding: 16px; }
+
+    .person-top {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 43px;
+      height: 43px;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: #292443;
+      color: #b9afff;
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    .person-info { min-width: 0; flex: 1; }
+    .person-info h3 { overflow-wrap: anywhere; }
+    .person-info p { margin: 5px 0 0; }
+
+    .sample-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 16px 0 10px;
+      font-size: 12px;
+    }
+
+    .sample-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    .sample {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid #343a4b;
+      background: #0e1118;
+      border-radius: 8px;
+      padding: 7px 9px;
+      font-size: 11px;
+      max-width: 100%;
+    }
+
+    .sample span { overflow-wrap: anywhere; }
+
+    .sample button {
+      border: none;
+      color: var(--red);
+      background: transparent;
+      padding: 0 2px;
+      font-weight: 900;
+    }
+
+    .person-actions {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .person-actions .btn { flex: 1; }
+
+    .empty {
+      padding: 28px 15px;
+      text-align: center;
+      border: 1px dashed #363c4c;
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .guide {
+      margin-top: 20px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #11141c;
+    }
+
+    .guide h3 { margin-bottom: 10px; }
+    .guide p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.8;
+      margin: 5px 0;
+    }
+
+    .privacy {
+      margin-top: 20px;
+      font-size: 11px;
+      color: #777f91;
+      line-height: 1.8;
+    }
+
+    @media (max-width: 850px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 500px) {
+      main { padding: 25px 14px 45px; }
+      .topbar { padding: 0 16px; }
+      .stats { gap: 7px; }
+      .stat { padding: 12px; }
+      .stat-value { font-size: 22px; }
+      .stat-label { font-size: 10px; }
+      .panel { padding: 14px; }
+      .camera-footer { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
 </head>
-<body><main>
-<header class="head"><div class="logo">⌁</div><div><div class="eyebrow">Visão computacional · Protótipo</div><h1>FaceID Studio</h1><div class="muted">Cadastre amostras e teste a comparação facial em tempo real.</div></div></header>
-<div class="grid">
-<section class="panel"><h2>01 / Câmera ao vivo</h2><div class="screen"><video id="video" autoplay muted playsinline class="hidden"></video><div class="placeholder" id="placeholder"><span>◎</span><strong>Câmera desligada</strong><div>Inicie a câmera para começar.</div></div></div><div class="status"><i id="dot" class="dot"></i><span id="status">Carregando modelos…</span></div><div class="actions"><button id="start" class="btn primary" disabled>Iniciar câmera</button><button id="stop" class="btn" disabled>Desligar câmera</button></div><div id="result" class="result" aria-live="polite">Aguardando os modelos e a câmera.</div><div class="stats"><div class="stat"><strong id="faceCount">0</strong><span>Rostos detectados agora</span></div><div class="stat"><strong id="sampleCount">0</strong><span>Amostras cadastradas</span></div></div></section>
-<section class="panel"><h2>02 / Cadastrar amostra</h2><div class="field"><label for="personName">Nome da pessoa</label><input id="personName" maxlength="60" placeholder="Ex.: Ana"></div><div class="field"><label for="angle">Ângulo</label><select id="angle"><option>Frente</option><option>Levemente à esquerda</option><option>Levemente à direita</option><option>Olhar para cima</option><option>Olhar para baixo</option><option>Outro</option></select></div><button id="register" class="btn primary" style="width:100%" disabled>＋ Adicionar amostra</button><p class="muted" style="font-size:12px">Para cadastrar, deixe apenas um rosto visível. Adicione mais amostras da mesma pessoa em diferentes ângulos e iluminação.</p><hr style="border-color:var(--line);margin:18px 0"><h2>03 / Pessoas cadastradas</h2><div id="people" class="people"><div class="empty">Nenhuma pessoa cadastrada.</div></div><button id="clear" class="btn" style="width:100%;margin-top:12px">Apagar todos os cadastros</button></section>
-</div>
-<div class="note"><p><strong>Privacidade e limitações:</strong> use apenas com consentimento das pessoas cadastradas. O navegador guarda descritores faciais numéricos localmente; não salva fotos de propósito. Descritores continuam sendo dados biométricos sensíveis. A comparação pode errar: este protótipo é educacional e não deve ser usado para controle de acesso, vigilância ou decisões importantes. Os modelos são baixados pela internet.</p></div><div class="foot">HTML · CSS · JavaScript · face-api.js</div>
+
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-icon">⌁</div>
+    <span>FaceID Studio</span>
+  </div>
+  <div class="badge">● Processamento local</div>
+</header>
+
+<main>
+  <div class="eyebrow">Painel de reconhecimento</div>
+  <h1>Gerencie seus rostos.</h1>
+  <p class="subtitle">
+    Cadastre pessoas, adicione amostras em diferentes ângulos
+    e acompanhe o reconhecimento em tempo real.
+  </p>
+
+  <section class="stats">
+    <div class="stat">
+      <div class="stat-label">Pessoas cadastradas</div>
+      <div class="stat-value" id="peopleCount">0</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Total de amostras</div>
+      <div class="stat-value" id="sampleCount">0</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Modelos de IA</div>
+      <div class="stat-value" id="modelStatus">...</div>
+    </div>
+  </section>
+
+  <div class="layout">
+    <section>
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>Visualização ao vivo</h2>
+          <span class="muted" id="cameraBadge">Desligada</span>
+        </div>
+
+        <div class="camera">
+          <div class="camera-label">FACE DETECTION</div>
+          <video id="video" autoplay muted playsinline></video>
+          <canvas id="canvas"></canvas>
+        </div>
+
+        <div class="camera-footer">
+          <div class="status" id="status">
+            <span class="dot"></span>
+            Carregando modelos...
+          </div>
+          <button class="btn success" id="startBtn" disabled>
+            Iniciar câmera
+          </button>
+        </div>
+
+        <div class="capture-box">
+          <h3 id="captureTitle">Cadastrar nova pessoa</h3>
+          <p id="captureDescription">
+            Inicie a câmera e mantenha apenas uma pessoa visível
+            durante cada captura.
+          </p>
+
+          <label for="personName">Nome da pessoa</label>
+          <input class="field" id="personName"
+                 maxlength="50" placeholder="Ex.: Rafael">
+
+          <label for="angle">Ângulo desta amostra</label>
+          <select class="field" id="angle">
+            <option value="Frente">Frente</option>
+            <option value="Esquerda">Rosto virado para a esquerda</option>
+            <option value="Direita">Rosto virado para a direita</option>
+            <option value="Levemente para cima">Levemente para cima</option>
+            <option value="Levemente para baixo">Levemente para baixo</option>
+            <option value="Outra posição">Outra posição</option>
+          </select>
+
+          <div class="capture-actions">
+            <button class="btn primary" id="captureBtn" disabled>
+              Capturar amostra
+            </button>
+            <button class="btn secondary" id="cancelBtn" hidden>
+              Cancelar edição
+            </button>
+          </div>
+          <p id="captureHint">
+            Dica: capture um ângulo por vez, com boa iluminação.
+          </p>
+        </div>
+      </div>
+
+      <div class="guide">
+        <h3>Como melhorar o cadastro</h3>
+        <p>01 — Comece com o rosto de frente, bem iluminado.</p>
+        <p>02 — Adicione amostras olhando para cada lado e em posições naturais.</p>
+        <p>03 — Evite rostos parcialmente escondidos ou imagens borradas.</p>
+        <p>04 — Use várias amostras distintas, sem depender apenas de dezenas de capturas quase idênticas.</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-heading">
+        <h2>Pessoas cadastradas</h2>
+        <span class="muted" id="listCount">0 registros</span>
+      </div>
+
+      <div class="person-list" id="peopleList"></div>
+
+      <p class="privacy">
+        Os descritores faciais são dados biométricos. Cadastre apenas
+        pessoas que tenham consentido. Os dados ficam neste navegador;
+        limpar os dados do site pode removê-los. Este protótipo não
+        comprova identidade e não deve ser usado como controle de acesso.
+      </p>
+    </section>
+  </div>
 </main>
+
 <script>
-(() => {
-const $=id=>document.getElementById(id), KEY='faceid_studio_v2', MODELS='https://justadudewhohacks.github.io/face-api.js/models';
-let stream=null,ready=false,busy=false,timer=null,people=read();
-function read(){try{const x=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(x)?x.filter(p=>p&&typeof p.name==='string'&&Array.isArray(p.samples)):[]}catch{return[]}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(people))}catch{status('Não foi possível salvar: armazenamento local cheio.')}render()}
-function status(s,live=false){$('status').textContent=s;$('dot').classList.toggle('live',live)}
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function render(){ $('sampleCount').textContent=people.reduce((n,p)=>n+p.samples.length,0);const host=$('people');host.replaceChildren();if(!people.length){host.innerHTML='<div class="empty">Nenhuma pessoa cadastrada.</div>';return}people.forEach((p,i)=>{const el=document.createElement('div');el.className='person';const info=document.createElement('div'),name=document.createElement('strong'),small=document.createElement('small');name.textContent=p.name;small.textContent=p.samples.length+' amostra(s) · '+p.samples.map(s=>s.angle).join(', ');info.append(name,small);const b=document.createElement('button');b.textContent='Remover';b.onclick=()=>{if(confirm('Remover o cadastro de '+p.name+'?')){people.splice(i,1);save()}};el.append(info,b);host.append(el)})}
-async function load(){try{if(!window.faceapi)throw Error('Biblioteca não carregada. Verifique a conexão.');await Promise.all([faceapi.nets.tinyFaceDetector.loadFromUri(MODELS),faceapi.nets.faceLandmark68Net.loadFromUri(MODELS),faceapi.nets.faceRecognitionNet.loadFromUri(MODELS)]);ready=true;$('start').disabled=false;status('Modelos prontos. Inicie a câmera.')}catch(e){status('Erro ao carregar modelos. Verifique a internet.');$('result').textContent=e.message}}
-async function start(){if(!ready||stream)return;try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});$('video').srcObject=stream;$('video').classList.remove('hidden');$('placeholder').classList.add('hidden');await $('video').play();$('start').disabled=true;$('stop').disabled=false;$('register').disabled=false;status('Câmera ativa. Posicione o rosto no quadro.',true);loop()}catch(e){status('Não foi possível acessar a câmera.');$('result').textContent='Permita o acesso à câmera e abra em HTTPS ou localhost. '+e.message}}
-function stop(){if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;if(timer)clearTimeout(timer);timer=null;$('video').pause();$('video').srcObject=null;$('video').classList.add('hidden');$('placeholder').classList.remove('hidden');$('start').disabled=!ready;$('stop').disabled=true;$('register').disabled=true;$('faceCount').textContent='0';status(ready?'Câmera desligada.':'Modelos ainda não carregados.')}
-async function detect(){if(!stream||$('video').readyState<2)return[];return faceapi.detectAllFaces($('video'),new faceapi.TinyFaceDetectorOptions({inputSize:320,scoreThreshold:.5})).withFaceLandmarks().withFaceDescriptors()}
-async function loop(){if(!stream)return;timer=setTimeout(async()=>{if(busy){loop();return}busy=true;try{const ds=await detect();$('faceCount').textContent=ds.length;if(!ds.length){$('result').textContent='Nenhum rosto detectado. Ajuste a iluminação e a posição.'}else if(!people.some(p=>p.samples.length)){$('result').textContent='Rosto detectado. Cadastre uma amostra para testar.'}else{const labels=people.filter(p=>p.samples.length).map(p=>new faceapi.LabeledFaceDescriptors(p.name,p.samples.map(s=>new Float32Array(s.descriptor))));const matcher=new faceapi.FaceMatcher(labels,.48);$('result').innerHTML='<strong>Resultado da comparação</strong><br>'+ds.map((d,i)=>{const m=matcher.findBestMatch(d.descriptor);return 'Rosto '+(i+1)+': '+esc(m.label==='unknown'?'Não reconhecido':m.label)+' · distância '+m.distance.toFixed(3)}).join('<br>')+'<br><small>Estimativa probabilística; pode errar.</small>'}}catch(e){$('result').textContent='Erro de detecção: '+e.message}finally{busy=false;if(stream)loop()}},500)}
-$('start').addEventListener('click',start);$('stop').addEventListener('click',stop);
-$('register').addEventListener('click',async()=>{if(!stream||busy)return;const name=$('personName').value.trim();if(!name){alert('Digite o nome da pessoa.');return}busy=true;$('register').disabled=true;try{const ds=await detect();if(ds.length!==1){alert('Deixe exatamente um rosto visível para cadastrar. Detectados: '+ds.length);return}let p=people.find(p=>p.name.toLocaleLowerCase('pt-BR')===name.toLocaleLowerCase('pt-BR'));if(!p){p={name,samples:[]};people.push(p)}p.samples.push({angle:$('angle').value,descriptor:Array.from(ds[0].descriptor),createdAt:new Date().toISOString()});save();$('result').innerHTML='Amostra adicionada para <strong>'+esc(p.name)+'</strong> ('+esc($('angle').value)+').'}catch(e){alert('Falha ao cadastrar: '+e.message)}finally{busy=false;$('register').disabled=!stream}});
-$('clear').addEventListener('click',()=>{if(confirm('Apagar todos os cadastros guardados neste navegador?')){people=[];save();$('result').textContent='Cadastros apagados deste navegador.'}});window.addEventListener('beforeunload',stop);render();load();
-})();
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const statusEl = document.getElementById("status");
+const startBtn = document.getElementById("startBtn");
+const captureBtn = document.getElementById("captureBtn");
+const cancelBtn = document.getElementById("cancelBtn");
+const nameInput = document.getElementById("personName");
+const angleInput = document.getElementById("angle");
+const captureTitle = document.getElementById("captureTitle");
+const captureDescription = document.getElementById("captureDescription");
+const captureHint = document.getElementById("captureHint");
+const peopleList = document.getElementById("peopleList");
+
+const MODEL_URL =
+  "https://justadudewhohacks.github.io/face-api.js/models";
+const STORAGE_KEY = "faceid_studio_v2";
+
+let people = loadPeople();
+let stream = null;
+let matcher = null;
+let modelsReady = false;
+let running = false;
+let busy = false;
+let editPersonId = null;
+let lastRun = 0;
+let captureLock = false;
+
+function uid() {
+  return crypto.randomUUID
+    ? crypto.randomUUID()
+    : Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
+function setStatus(message, color = "#8993a7") {
+  statusEl.replaceChildren();
+
+  const dot = document.createElement("span");
+  dot.className = "dot" + (color === "#42e6a4" ? " on" : "");
+
+  statusEl.append(dot, document.createTextNode(" " + message));
+  statusEl.style.color = color;
+}
+
+function loadPeople() {
+  try {
+    const value = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+
+    if (!Array.isArray(value)) return [];
+
+    return value.filter(p =>
+      p.id &&
+      typeof p.name === "string" &&
+      Array.isArray(p.samples) &&
+      p.samples.every(s =>
+        typeof s.angle === "string" &&
+        Array.isArray(s.descriptor) &&
+        s.descriptor.length === 128 &&
+        s.descriptor.every(Number.isFinite)
+      )
+    );
+  } catch (error) {
+    console.error("Erro ao ler cadastros:", error);
+    return [];
+  }
+}
+
+function savePeople() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(people));
+    rebuildMatcher();
+    renderPeople();
+  } catch (error) {
+    console.error(error);
+    setStatus("Não foi possível salvar os dados neste navegador.", "#ff7185");
+  }
+}
+
+function rebuildMatcher() {
+  const registered = people.filter(p => p.samples.length > 0);
+
+  if (!modelsReady || registered.length === 0) {
+    matcher = null;
+    return;
+  }
+
+  const labeled = registered.map(person =>
+    new faceapi.LabeledFaceDescriptors(
+      person.id,
+      person.samples.map(s => new Float32Array(s.descriptor))
+    )
+  );
+
+  matcher = new faceapi.FaceMatcher(labeled, 0.48);
+}
+
+async function loadModels() {
+  try {
+    setStatus("Carregando modelos de IA...");
+
+    await Promise.all([
+      faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+      faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+      faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+    ]);
+
+    modelsReady = true;
+    document.getElementById("modelStatus").textContent = "OK";
+    startBtn.disabled = false;
+
+    rebuildMatcher();
+    renderPeople();
+    setStatus("Modelos prontos. Inicie a câmera.", "#42e6a4");
+  } catch (error) {
+    console.error(error);
+    document.getElementById("modelStatus").textContent = "!";
+    setStatus("Falha ao carregar modelos. Verifique a internet.", "#ff7185");
+  }
+}
+
+async function startCamera() {
+  if (running || !modelsReady) return;
+
+  startBtn.disabled = true;
+
+  try {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      throw new Error("Use HTTPS ou localhost para acessar a câmera.");
+    }
+
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        facingMode: "user",
+        width: { ideal: 640 },
+        height: { ideal: 480 }
+      }
+    });
+
+    video.srcObject = stream;
+    await video.play();
+
+    running = true;
+    startBtn.textContent = "Câmera ativa";
+    document.getElementById("cameraBadge").textContent = "Ao vivo";
+
+    captureBtn.disabled = false;
+    setStatus("Câmera ativa. Posicione o rosto.", "#42e6a4");
+    requestAnimationFrame(detectLoop);
+  } catch (error) {
+    console.error(error);
+
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    stream = null;
+
+    startBtn.disabled = false;
+    startBtn.textContent = "Tentar novamente";
+
+    setStatus("Erro na câmera: " + error.message, "#ff7185");
+  }
+}
+
+async function detectLoop() {
+  if (!running) return;
+
+  if (busy) {
+    requestAnimationFrame(detectLoop);
+    return;
+  }
+
+  if (performance.now() - lastRun < 180) {
+    requestAnimationFrame(detectLoop);
+    return;
+  }
+
+  lastRun = performance.now();
+  busy = true;
+
+  try {
+    const results = await faceapi
+      .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({
+        inputSize: 320,
+        scoreThreshold: 0.5
+      }))
+      .withFaceLandmarks()
+      .withFaceDescriptors();
+
+    if (!running) return;
+
+    drawResults(results);
+
+    if (results.length === 0) {
+      setStatus("Nenhum rosto detectado.");
+    } else {
+      setStatus(
+        `${results.length} rosto(s) detectado(s).`,
+        "#42e6a4"
+      );
+    }
+  } catch (error) {
+    console.error(error);
+    setStatus("Erro no processamento facial.", "#ff7185");
+  } finally {
+    busy = false;
+    if (running) requestAnimationFrame(detectLoop);
+  }
+}
+
+function drawResults(results) {
+  const w = video.videoWidth;
+  const h = video.videoHeight;
+
+  if (!w || !h) return;
+
+  if (canvas.width !== w || canvas.height !== h) {
+    canvas.width = w;
+    canvas.height = h;
+  }
+
+  ctx.clearRect(0, 0, w, h);
+
+  for (const result of results) {
+    const b = result.detection.box;
+    const x = w - b.x - b.width;
+    const y = b.y;
+    const bw = b.width;
+    const bh = b.height;
+
+    let label = "Não cadastrado";
+    let color = "#ffd479";
+
+    if (matcher) {
+      const best = matcher.findBestMatch(result.descriptor);
+
+      if (best.label !== "unknown") {
+        const person = people.find(p => p.id === best.label);
+
+        if (person) {
+          label = person.name;
+          color = "#42e6a4";
+        }
+      }
+    }
+
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(x, y, bw, bh);
+
+    ctx.font = "bold 15px Arial";
+
+    const labelWidth = Math.min(
+      w - Math.max(0, x),
+      ctx.measureText(label).width + 16
+    );
+
+    const labelY = Math.max(0, y - 28);
+
+    ctx.fillStyle = color;
+    ctx.fillRect(x, labelY, labelWidth, 26);
+
+    ctx.fillStyle = "#101114";
+    ctx.fillText(label, x + 7, labelY + 18);
+  }
+}
+
+function resetEditor() {
+  editPersonId = null;
+  nameInput.value = "";
+  captureTitle.textContent = "Cadastrar nova pessoa";
+  captureDescription.textContent =
+    "Cadastre a primeira amostra e depois adicione outros ângulos.";
+  captureBtn.textContent = "Cadastrar primeira amostra";
+  cancelBtn.hidden = true;
+  captureHint.textContent =
+    "Dica: capture um ângulo por vez, com boa iluminação.";
+}
+
+function beginAddSample(id) {
+  editPersonId = id;
+  const person = people.find(p => p.id === id);
+  if (!person) return;
+
+  nameInput.value = person.name;
+  captureTitle.textContent = "Adicionar amostra: " + person.name;
+  captureDescription.textContent =
+    "Posicione a mesma pessoa no ângulo escolhido e capture uma nova amostra.";
+  captureBtn.textContent = "Capturar nova amostra";
+  cancelBtn.hidden = false;
+  captureHint.textContent =
+    `Já existem ${person.samples.length} amostra(s). A nova será adicionada sem apagar as anteriores.`;
+
+  document.querySelector(".capture-box").scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+
+  if (running) setStatus("Prepare o novo ângulo e capture.", "#42e6a4");
+}
+
+async function captureSample() {
+  if (!running || !modelsReady || captureLock) {
+    setStatus("Inicie a câmera antes de capturar.", "#ffd479");
+    return;
+  }
+
+  const name = nameInput.value.trim();
+
+  if (!name) {
+    setStatus("Digite o nome da pessoa.", "#ff7185");
+    nameInput.focus();
+    return;
+  }
+
+  const existing = editPersonId
+    ? people.find(p => p.id === editPersonId)
+    : null;
+
+  if (existing && existing.name !== name &&
+      people.some(p => p.id !== existing.id &&
+        p.name.toLowerCase() === name.toLowerCase())) {
+    setStatus("Já existe uma pessoa com esse nome.", "#ff7185");
+    return;
+  }
+
+  if (!existing &&
+      people.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+    setStatus(
+      "Esse nome já está cadastrado. Use Adicionar amostra no cartão da pessoa.",
+      "#ff7185"
+    );
+    return;
+  }
+
+  captureLock = true;
+  captureBtn.disabled = true;
+
+  try {
+    let faces = [];
+
+    // Espera uma janela livre do processamento em tempo real.
+    for (let attempt = 0; attempt < 15; attempt++) {
+      while (busy && running) {
+        await new Promise(resolve => setTimeout(resolve, 30));
+      }
+
+      if (!running) throw new Error("A câmera foi encerrada.");
+
+      busy = true;
+
+      try {
+        faces = await faceapi
+          .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({
+            inputSize: 416,
+            scoreThreshold: 0.55
+          }))
+          .withFaceLandmarks()
+          .withFaceDescriptors();
+      } finally {
+        busy = false;
+      }
+
+      if (faces.length === 1) break;
+
+      await new Promise(resolve => setTimeout(resolve, 150));
+    }
+
+    if (faces.length !== 1) {
+      throw new Error(
+        faces.length === 0
+          ? "Nenhum rosto encontrado. Melhore a iluminação e tente novamente."
+          : "Há mais de um rosto visível. Deixe apenas a pessoa cadastrada na câmera."
+      );
+    }
+
+    let person = existing;
+
+    if (!person) {
+      person = {
+        id: uid(),
+        name,
+        samples: []
+      };
+
+      people.push(person);
+      editPersonId = person.id;
+    } else {
+      person.name = name;
+    }
+
+    person.samples.push({
+      id: uid(),
+      angle: angleInput.value,
+      descriptor: Array.from(faces[0].descriptor)
+    });
+
+    savePeople();
+
+    nameInput.value = person.name;
+    captureTitle.textContent = "Adicionar amostra: " + person.name;
+    captureDescription.textContent =
+      "Escolha outro ângulo e capture novamente quando quiser.";
+    captureBtn.textContent = "Capturar nova amostra";
+    cancelBtn.hidden = false;
+    captureHint.textContent =
+      `${person.samples.length} amostra(s) cadastrada(s) para ${person.name}.`;
+
+    setStatus(
+      `Amostra "${angleInput.value}" adicionada para ${person.name}.`,
+      "#42e6a4"
+    );
+  } catch (error) {
+    console.error(error);
+    setStatus(error.message, "#ff7185");
+  } finally {
+    captureLock = false;
+    captureBtn.disabled = !running;
+  }
+}
+
+function renderPeople() {
+  peopleList.replaceChildren();
+
+  const totalSamples = people.reduce(
+    (sum, person) => sum + person.samples.length, 0
+  );
+
+  document.getElementById("peopleCount").textContent = people.length;
+  document.getElementById("sampleCount").textContent = totalSamples;
+  document.getElementById("listCount").textContent =
+    `${people.length} registro(s)`;
+
+  if (people.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent =
+      "Nenhuma pessoa cadastrada ainda. Use o formulário ao lado para criar seu primeiro cadastro.";
+    peopleList.appendChild(empty);
+    return;
+  }
+
+  for (const person of people) {
+    const card = document.createElement("article");
+    card.className = "person-card";
+
+    const top = document.createElement("div");
+    top.className = "person-top";
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = person.name.trim().charAt(0).toUpperCase();
+
+    const info = document.createElement("div");
+    info.className = "person-info";
+
+    const title = document.createElement("h3");
+    title.textContent = person.name;
+
+    const sub = document.createElement("p");
+    sub.className = "muted";
+    sub.textContent = `${person.samples.length} amostra(s) facial(is)`;
+
+    info.append(title, sub);
+    top.append(avatar, info);
+    card.append(top);
+
+    const summary = document.createElement("div");
+    summary.className = "sample-summary";
+
+    const summaryLabel = document.createElement("span");
+    summaryLabel.textContent = "Amostras cadastradas";
+
+    const summaryCount = document.createElement("span");
+    summaryCount.className = "muted";
+    summaryCount.textContent = String(person.samples.length);
+
+    summary.append(summaryLabel, summaryCount);
+    card.append(summary);
+
+    const sampleList = document.createElement("div");
+    sampleList.className = "sample-list";
+
+    person.samples.forEach((sample, index) => {
+      const chip = document.createElement("div");
+      chip.className = "sample";
+
+      const label = document.createElement("span");
+      label.textContent = `${index + 1}. ${sample.angle}`;
+
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.textContent = "×";
+      remove.title = "Excluir esta amostra";
+      remove.setAttribute(
+        "aria-label",
+        `Excluir amostra ${sample.angle} de ${person.name}`
+      );
+
+      remove.addEventListener("click", () => {
+        const confirmed = confirm(
+          `Excluir a amostra "${sample.angle}" de ${person.name}?`
+        );
+
+        if (!confirmed) return;
+
+        person.samples = person.samples.filter(s => s.id !== sample.id);
+
+        if (person.samples.length === 0) {
+          people = people.filter(p => p.id !== person.id);
+
+          if (editPersonId === person.id) resetEditor();
+        }
+
+        savePeople();
+        setStatus("Amostra removida.", "#ffd479");
+      });
+
+      chip.append(label, remove);
+      sampleList.append(chip);
+    });
+
+    card.append(sampleList);
+
+    const actions = document.createElement("div");
+    actions.className = "person-actions";
+
+    const add = document.createElement("button");
+    add.className = "btn primary";
+    add.textContent = "+ Amostra";
+    add.addEventListener("click", () => beginAddSample(person.id));
+
+    const rename = document.createElement("button");
+    rename.className = "btn secondary";
+    rename.textContent = "Renomear";
+    rename.addEventListener("click", () => {
+      const newName = prompt("Novo nome:", person.name);
+      if (newName === null) return;
+
+      const trimmed = newName.trim();
+
+      if (!trimmed) {
+        alert("O nome não pode ficar vazio.");
+        return;
+      }
+
+      if (people.some(p => p.id !== person.id &&
+          p.name.toLowerCase() === trimmed.toLowerCase())) {
+        alert("Já existe outra pessoa com esse nome.");
+        return;
+      }
+
+      person.name = trimmed;
+      savePeople();
+
+      if (editPersonId === person.id) {
+        nameInput.value = trimmed;
+        captureTitle.textContent = "Adicionar amostra: " + trimmed;
+      }
+    });
+
+    const removePerson = document.createElement("button");
+    removePerson.className = "btn danger";
+    removePerson.textContent = "Excluir";
+    removePerson.addEventListener("click", () => {
+      if (!confirm(`Excluir ${person.name} e todas as suas amostras?`)) {
+        return;
+      }
+
+      people = people.filter(p => p.id !== person.id);
+
+      if (editPersonId === person.id) resetEditor();
+
+      savePeople();
+      setStatus("Cadastro excluído.", "#ffd479");
+    });
+
+    actions.append(add, rename, removePerson);
+    card.append(actions);
+    peopleList.append(card);
+  }
+}
+
+captureBtn.addEventListener("click", captureSample);
+startBtn.addEventListener("click", startCamera);
+cancelBtn.addEventListener("click", resetEditor);
+
+window.addEventListener("pagehide", () => {
+  running = false;
+
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+    stream = null;
+  }
+
+  video.srcObject = null;
+});
+
+renderPeople();
+loadModels();
 </script>
-</body></html>
+</body>
+</html>
