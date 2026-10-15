@@ -1,0 +1,18 @@
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+
+# Dependências e arquivos temporários
+node_modules/
+*.log
+
+# Não versionar dados biométricos, fotos ou exportações locais
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.face-descriptors
